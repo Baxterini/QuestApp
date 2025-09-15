@@ -176,7 +176,7 @@ if st.session_state["room"] == "start":
         index=0
     )
 
-    # <<< TU musi być wcięcie >>>
+    
     if st.button("Wejdź do pokoju"):
         # 1) Zapis do pliku
         data["user"]["name"] = name.strip()
@@ -408,6 +408,9 @@ elif st.session_state["room"] == "health":
     st.caption("Legenda: 🚵 Ty | 🟩 przebyte | ▫️ do przejechania | 💧🍎🛌📓🧘 power-upy | 🏰 meta | 👑 nagroda")
 
 # ---------------- MIND ROOM 🧘 ----------------
+
+
+
 elif st.session_state["room"] == "mind":
     st.title("🧘 Mind Room — Guided Meditation")
     greet_user("Witaj")
@@ -417,6 +420,10 @@ elif st.session_state["room"] == "mind":
     openai_key = st.text_input("OpenAI API Key", type="password")
     if not openai_key:
         st.info("➡️ Wklej klucz, żeby odblokować generowanie.")
+        client = None
+    else:
+        client = OpenAI(api_key=openai_key)
+
 
     st.markdown("Witaj w pokoju Mind! Tutaj możesz wygenerować swoją spersonalizowaną medytację ✨")
 
@@ -461,8 +468,6 @@ elif st.session_state["room"] == "mind":
 
         try:
             
-            client = OpenAI(api_key=openai_key)
-
             with st.spinner("Generuję medytację tekstową..."):
                 resp = client.chat.completions.create(
                     model="gpt-4o-mini",
@@ -525,13 +530,6 @@ elif st.session_state["room"] == "mind":
         AudioSegment.converter = ffmpeg_path
         AudioSegment.ffmpeg = ffmpeg_path
         AudioSegment.ffprobe = ffprobe_path
-    
-
-        # Pydub: wskażemy binarki wprost
-        AudioSegment.converter = ffmpeg_path
-        AudioSegment.ffmpeg = ffmpeg_path
-        AudioSegment.ffprobe = ffprobe_path
-
 
         os.makedirs("meditations", exist_ok=True)
         os.makedirs("assets/sounds", exist_ok=True)
@@ -570,8 +568,7 @@ elif st.session_state["room"] == "mind":
                 # wczytaj jawnie jako MP3 (często usuwa WinError 2 na Windows)
                 voice = AudioSegment.from_file(voice_path, format="mp3")
                 voice = voice.apply_gain(v_gain_db)
-                # (opcjonalnie diagnostyka — możesz usunąć po teście)
-                st.caption(f"Loaded voice: {len(voice)} ms")
+                
 
 
                 if bg_choice != "(brak)":
@@ -665,7 +662,7 @@ elif st.session_state["room"] == "mind":
             st.error("Podaj OpenAI API Key.")
             st.stop()
         try:
-            client = OpenAI(api_key=openai_key)
+            
             prompt_text = dalle_prompt(user_prompt)
 
             with st.spinner("Generuję obraz…"):
