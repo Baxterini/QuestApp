@@ -4,7 +4,7 @@ import json
 import random
 from pathlib import Path
 from typing import List
-from openai import OpenAI
+import openai
 import base64
 from io import BytesIO
 import os
@@ -420,9 +420,9 @@ elif st.session_state["room"] == "mind":
     openai_key = st.text_input("OpenAI API Key", type="password")
     if not openai_key:
         st.info("➡️ Wklej klucz, żeby odblokować generowanie.")
-        client = None
     else:
-        client = OpenAI(api_key=openai_key)
+        openai.api_key = openai_key
+
 
 
     st.markdown("Witaj w pokoju Mind! Tutaj możesz wygenerować swoją spersonalizowaną medytację ✨")
@@ -469,7 +469,7 @@ elif st.session_state["room"] == "mind":
         try:
             
             with st.spinner("Generuję medytację tekstową..."):
-                resp = client.chat.completions.create(
+                resp = openai.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
                         {"role": "system", "content": "Jesteś spokojnym nauczycielem medytacji. Język: polski."},
@@ -666,7 +666,7 @@ elif st.session_state["room"] == "mind":
             prompt_text = dalle_prompt(user_prompt)
 
             with st.spinner("Generuję obraz…"):
-                resp = client.images.generate(
+                resp = openai.images.generate(
                     model="dall-e-2",   # DALL·E 2
                     prompt=prompt_text,
                     size=img_size,
