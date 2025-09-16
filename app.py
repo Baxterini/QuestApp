@@ -15,6 +15,21 @@ import re
 import streamlit as st
 from pydantic import BaseModel
 
+# --- DIAGNOSTYKA WERSJI ---
+try:
+    import openai, streamlit, pydub
+    from gtts import gTTS
+    import sys
+
+    st.caption(f"✅ openai version: {openai.__version__}")
+    st.caption(f"✅ streamlit version: {streamlit.__version__}")
+    st.caption(f"✅ pydub version: {pydub.__version__}")
+    st.caption(f"✅ gTTS version: {gTTS.__module__.split('.')[0]} (import ok)")
+    st.caption(f"✅ Python version: {sys.version.split()[0]}")
+except Exception as e:
+    st.error(f"❌ Błąd diagnostyki: {e}")
+
+
 # ---------------- UI / STYL ----------------
 st.set_page_config(page_title="QuestApp", page_icon="🌟", layout="centered")
 
