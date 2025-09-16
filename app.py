@@ -15,6 +15,10 @@ import re
 import streamlit as st
 from pydantic import BaseModel
 
+
+# ---------------- UI / STYL ----------------
+st.set_page_config(page_title="QuestApp", page_icon="🌟", layout="centered")
+
 # --- DIAGNOSTYKA WERSJI ---
 try:
     import openai, streamlit, pydub
@@ -29,9 +33,6 @@ try:
 except Exception as e:
     st.error(f"❌ Błąd diagnostyki: {e}")
 
-
-# ---------------- UI / STYL ----------------
-st.set_page_config(page_title="QuestApp", page_icon="🌟", layout="centered")
 
 # ---------------- SIDEBAR ----------------
 with st.sidebar:
