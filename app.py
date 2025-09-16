@@ -21,7 +21,20 @@ from pydantic import BaseModel
 # ---------------- UI / STYL ----------------
 st.set_page_config(page_title="QuestApp", page_icon="🌟", layout="centered")
 
-# --- DIAGNOSTYKA WERSJI ---
+# --- kompatybilność st.image: akceptuj use_container_width w Streamlit 1.38 ---
+try:
+    import inspect
+    if "use_container_width" not in inspect.signature(st.image).parameters:
+        _orig_image = st.image
+        def _image_compat(*args, **kwargs):
+            if "use_container_width" in kwargs:
+                kwargs.pop("use_container_width")
+                kwargs.setdefault("use_column_width", True)
+            return _orig_image(*args, **kwargs)
+        st.image = _image_compat
+except Exception:
+    pass
+
 # --- DIAGNOSTYKA WERSJI ---
 try:
     import sys, importlib.metadata as ilmd
