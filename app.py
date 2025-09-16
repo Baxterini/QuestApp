@@ -20,15 +20,22 @@ from pydantic import BaseModel
 st.set_page_config(page_title="QuestApp", page_icon="🌟", layout="centered")
 
 # --- DIAGNOSTYKA WERSJI ---
+# --- DIAGNOSTYKA WERSJI ---
 try:
-    import openai, streamlit, pydub
+    import sys, importlib.metadata as ilmd
+    import openai, streamlit as stlib, pydub
     from gtts import gTTS
-    import sys
+
+    def ver(pkg, fallback="unknown"):
+        try:
+            return ilmd.version(pkg)
+        except Exception:
+            return fallback
 
     st.caption(f"✅ openai version: {openai.__version__}")
-    st.caption(f"✅ streamlit version: {streamlit.__version__}")
-    st.caption(f"✅ pydub version: {pydub.__version__}")
-    st.caption(f"✅ gTTS version: {gTTS.__module__.split('.')[0]} (import ok)")
+    st.caption(f"✅ streamlit version: {stlib.__version__}")
+    st.caption(f"✅ pydub version: {getattr(pydub, '__version__', ver('pydub'))}")
+    st.caption("✅ gTTS import OK")
     st.caption(f"✅ Python version: {sys.version.split()[0]}")
 except Exception as e:
     st.error(f"❌ Błąd diagnostyki: {e}")
