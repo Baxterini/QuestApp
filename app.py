@@ -4,13 +4,15 @@ import json
 import random
 from pathlib import Path
 from typing import List
-import openai
+from openai import OpenAI
 import base64
 from io import BytesIO
 import os
 import requests
 from shutil import which
 import re
+import httpx
+
 
 import streamlit as st
 from pydantic import BaseModel
@@ -450,21 +452,29 @@ elif st.session_state["room"] == "health":
 
 # ---------------- MIND ROOM 🧘 ----------------
 
-
-
 elif st.session_state["room"] == "mind":
     st.title("🧘 Mind Room — Guided Meditation")
     greet_user("Witaj")
 
+
     # --- Klucz API ---
     st.markdown("🔑 Podaj swój klucz OpenAI, aby wygenerować medytację:")
     openai_key = st.text_input("OpenAI API Key", type="password")
+
     if not openai_key:
         st.info("➡️ Wklej klucz, żeby odblokować generowanie.")
     else:
-        openai.api_key = openai_key
-
-
+        # (re)inicjalizacja tylko gdy klucz się zmienił albo jeszcze nie ma klienta
+        if (
+            "openai_client" not in st.session_state
+            or st.session_state.get("openai_key") != openai_key
+        ):
+            st.session_state["openai_key"] = openai_key
+            st.session_state["openai_client"] = OpenAI(
+                api_key=openai_key,
+                http_client=httpx.Client(trust_env=False)  # ignoruje HTTP(S)_PROXY na Cloud
+            )
+        client = st.session_state["openai_client"]
 
     st.markdown("Witaj w pokoju Mind! Tutaj możesz wygenerować swoją spersonalizowaną medytację ✨")
 
@@ -510,7 +520,7 @@ elif st.session_state["room"] == "mind":
         try:
             
             with st.spinner("Generuję medytację tekstową..."):
-                resp = openai.chat.completions.create(
+                resp = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
                         {"role": "system", "content": "Jesteś spokojnym nauczycielem medytacji. Język: polski."},
@@ -708,7 +718,7 @@ elif st.session_state["room"] == "mind":
             prompt_text = dalle_prompt(user_prompt)
 
             with st.spinner("Generuję obraz…"):
-                resp = openai.images.generate(
+                resp = client.images.generate(
                     model="dall-e-2",   # DALL·E 2
                     prompt=prompt_text,
                     size=img_size,
@@ -718,11 +728,13 @@ elif st.session_state["room"] == "mind":
             # pobieramy URL obrazu
             img_url = resp.data[0].url  
 
+            # pobieramy bajty obrazu z URL
+            img_bytes = requests.get(img_url, timeout=30).content
+
             # pokazujemy w Streamlit
             st.image(img_url, caption="Twoja wizualizacja ✨", use_container_width=True)
 
             # przycisk pobierania
-            img_bytes = requests.get(img_url).content
             st.download_button(
                 "💾 Pobierz PNG",
                 data=img_bytes,
