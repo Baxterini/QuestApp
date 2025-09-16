@@ -98,6 +98,24 @@ def clean_markdown_for_tts(text: str) -> str:
     # usuwamy podwójne i większe spacje
     text = re.sub(r"\s{2,}", " ", text).strip()
     return text
+def strip_pause_words(text: str) -> str:
+    """
+    Usuwa/wygładza wzmianki o pauzach, żeby TTS ich nie czytał.
+    Obsługiwane: 'pauza', 'pauza 5 sekund', '(pauza 3s)', '[PAUZA 10]' itd.
+    """
+    # [PAUZA 5] / [pauza 5] / (pauza 5s)
+    text = re.sub(r"\[?\(?\s*pauza\s*\d+\s*(sekundy|sekund|sek|s)?\s*\)?\]?", " ", text, flags=re.IGNORECASE)
+
+    # same słowo 'pauza' w zdaniu (np. "zrób pauza, teraz...")
+    text = re.sub(r"\b[pP]auza\b", " ", text)
+
+    # warianty skrótów (np. "pauza 5 s" z odstępem)
+    text = re.sub(r"\b[pP]auza\s*\d+\s*s(ek)?\b", " ", text)
+
+    # podwójne spacje po czyszczeniu
+    text = re.sub(r"\s{2,}", " ", text).strip()
+    return text
+
 
 
 # ---------------- DANE ----------------
@@ -562,6 +580,7 @@ elif st.session_state["room"] == "mind":
 
                 # czyścimy tekst z markdown/emoji zanim poleci do TTS
                 clean_text = clean_markdown_for_tts(st.session_state["mind_text"])
+                clean_text = strip_pause_words(clean_text)
 
                 # generujemy głos
                 gTTS(clean_text, lang="pl").save(voice_path)
