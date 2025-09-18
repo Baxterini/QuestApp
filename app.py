@@ -347,12 +347,33 @@ elif st.session_state["room"] == "health":
         h = hashlib.sha256(seed.encode("utf-8")).hexdigest()
         return int(h, 16) % n
 
-    def ufo_flight():
-        lane = st.empty()
-        trail = " " * 28
-        for i in range(len(trail)):
-            lane.markdown(f"```\n{trail[:i]}🛸\n```")
-            time.sleep(0.02)
+    def ufo_flight(duration_sec: float = 2.2):
+        # Płynny przelot z lekkim bujaniem (1 przebieg)
+        st.markdown(f"""
+        <div class="ufo-wrap"><span class="ufo">🛸</span></div>
+        <style>
+        .ufo-wrap {{
+            position: relative; height: 32px; overflow: hidden;
+            margin: .25rem 0 .5rem 0;
+        }}
+        .ufo {{
+            position: absolute; left: -40px; top: 2px;
+            font-size: 22px;
+            animation: fly {duration_sec}s linear 1,
+                    wobble {duration_sec/6:.2f}s ease-in-out infinite alternate;
+        }}
+        @keyframes fly {{
+            0%   {{ left: -40px;   transform: translateY(0) rotate(0deg); }}
+            50%  {{                 transform: translateY(-6px) rotate(3deg); }}
+            100% {{ left: calc(100% + 40px); transform: translateY(0) rotate(0deg); }}
+        }}
+        @keyframes wobble {{
+            from {{ filter: drop-shadow(0 0 0 rgba(255,255,255,.0)); }}
+            to   {{ filter: drop-shadow(0 0 6px rgba(255,255,255,.6)); }}
+        }}
+        </style>
+        """, unsafe_allow_html=True)
+
 
     # ta sama ciekawostka dla wszystkich w danej kategorii przez cały dzień
     today = dt.date.today().isoformat()
@@ -363,14 +384,18 @@ elif st.session_state["room"] == "health":
         st.success(f"💡 Dzisiejsza ciekawostka ({kat}):\n\n{st.session_state[daily_key]}")
         st.caption("🔒 Zablokowane do północy. Nowa ciekawostka jutro.")
     else:
+        speed = st.slider("⏱️ Czas przelotu UFO", 1.2, 4.0, 2.2, 0.1)
+
         if st.button("🪨 Rzuć kamieniem w UFO!"):
-            ufo_flight()
+            ufo_flight(speed)
             idx = daily_index(seed=f"{kat}|{today}", n=len(FACTS[kat]))
             fact = FACTS[kat][idx]
             st.session_state[daily_key] = fact
+            st.balloons()
             st.success(f"🎯 Trafione!\n\n💡 {fact}")
         else:
             st.info("Kliknij, żeby odkryć dzisiejszą ciekawostkę.")
+
     # === KONIEC BLOKU UFO ===
 
     cols = st.columns([2,1,1])
