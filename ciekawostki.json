@@ -1,0 +1,122 @@
+{
+  "Zwierzęta": [
+    "Ośmiornica ma trzy serca.",
+    "Flamingi różowieją od krewetek.",
+    "Delfiny rozpoznają się po indywidualnych gwizdach.",
+    "Rekiny istnieją dłużej niż drzewa.",
+    "Słonie potrafią rozpoznać się w lustrze.",
+    "Krowy mają najlepsze przyjaciółki i stresują się, gdy są rozdzielone.",
+    "Nietoperze to jedyne latające ssaki.",
+    "Ślimak może spać nawet 3 lata.",
+    "Panda spędza około 12 godzin dziennie na jedzeniu bambusa.",
+    "Serce płetwala błękitnego waży tyle, co mały samochód."
+  ],
+  "IT": [
+    "Pierwszy e-mail wysłano w 1971.",
+    "Pierwsza strona WWW to info.cern.ch.",
+    "Android był pierwotnie dla aparatów fotograficznych.",
+    "Logo Apple pierwotnie przedstawiało Newtona pod jabłonią.",
+    "Wikipedia wystartowała w 2001 roku.",
+    "Pierwszy iPhone pojawił się w 2007 roku.",
+    "Linus Torvalds stworzył Linuksa jako projekt hobbystyczny.",
+    "Windows 1.0 miał premierę w 1985 roku.",
+    "Hasło 'qwerty' to jedno z najczęściej używanych haseł na świecie.",
+    "Pierwszy komputer osobisty ważył ponad 20 kg."
+  ],
+  "Kraje": [
+    "Kanada ma najdłuższą linię brzegową na świecie.",
+    "Australia jest domem dla większej liczby kangurów niż ludzi.",
+    "W Japonii jest więcej automatów sprzedających niż ludzi w Polsce.",
+    "Norwegia rozdaje darmowe podręczniki szkolne wszystkim uczniom.",
+    "W Islandii nie ma komarów.",
+    "Chiny mają największą populację na świecie.",
+    "Monako jest mniejsze niż Central Park w Nowym Jorku.",
+    "Szwajcaria ma więcej bunkrów niż żołnierzy.",
+    "Holandia słynie z rowerów – jest ich więcej niż mieszkańców.",
+    "Polska ma jedną z największych ilości zamków w Europie."
+  ],
+  "Filmy": [
+    "Zielony kod w Matrixie to przepisy na sushi.",
+    "Oscary pierwotnie trwały tylko 15 minut.",
+    "„Psychoza” zniechęciła ludzi do pryszniców.",
+    "W filmie 'Titanic' scenę zegarka improwizował DiCaprio.",
+    "W 'Władcy Pierścieni' pierścień był w kilku wersjach rozmiaru.",
+    "Jurassic Park zarobił ponad miliard dolarów.",
+    "Pierwszy film dźwiękowy to 'Śpiewak jazzbandu' (1927).",
+    "W 'Gwiezdnych Wojnach' dźwięk miecza świetlnego powstał z telewizora i projektora.",
+    "Film 'Avatar' był najdroższą produkcją swojego czasu.",
+    "W 'Incepcji' każdy bohater ma własną melodię muzyczną."
+  ],
+  "Muzyka": [
+    "Najgłośniejszy koncert świata dał zespół The Who w 1976 roku.",
+    "Beethoven komponował mimo głuchoty.",
+    "Michael Jackson sprzedał ponad 100 mln egzemplarzy albumu 'Thriller'.",
+    "Pierwsza płyta CD wydana w 1982 roku to 'The Visitors' zespołu ABBA.",
+    "W Japonii istnieją bary karaoke od lat 70.",
+    "Najdłuższa symfonia świata trwa ponad 8 godzin.",
+    "Gitara elektryczna powstała w latach 30. XX wieku.",
+    "Elvis Presley jest nazywany Królem Rock and Rolla.",
+    "Najwięcej koncertów zagrał zespół Grateful Dead.",
+    "Spotify powstał w Szwecji w 2006 roku."
+  ],
+  "Kosmos": [
+    "Na Marsie zachody słońca są niebieskie.",
+    "Jeden dzień na Wenus trwa dłużej niż jej rok.",
+    "W kosmosie nie słychać dźwięków – brak tam powietrza.",
+    "Pierwszy pies w kosmosie to Łajka.",
+    "Czarna dziura nie pozwala uciec nawet światłu.",
+    "Pierwszy człowiek na Księżycu to Neil Armstrong (1969).",
+    "Na Saturnie padają deszcze z diamentów.",
+    "W Drodze Mlecznej jest więcej gwiazd niż ziaren piasku na Ziemi.",
+    "Międzynarodowa Stacja Kosmiczna krąży wokół Ziemi co 90 minut.",
+    "Pierwszy sztuczny satelita to Sputnik (1957)."
+  ],
+  "Historia": [
+    "Pierwsze igrzyska olimpijskie odbyły się w 776 r. p.n.e. w Grecji.",
+    "Wikingowie docierali do Ameryki 500 lat przed Kolumbem.",
+    "Mury Chińskie mają ponad 21 tysięcy km długości.",
+    "Leonardo da Vinci wynalazł prototyp helikoptera.",
+    "Pierwsze drukowane książki pojawiły się w XV wieku.",
+    "Piramidy w Gizie mają ponad 4500 lat.",
+    "Rzymianie wynaleźli beton.",
+    "Pierwsze uniwersytety powstały w średniowieczu.",
+    "Napoleon był niższy niż podaje legenda (miał ok. 169 cm).",
+    "Pierwsze gazety drukowane pojawiły się w XVII wieku."
+  ],
+  "Nauka": [
+    "DNA odkryto w 1869 roku.",
+    "Einstein otrzymał Nobla nie za teorię względności, lecz za efekt fotoelektryczny.",
+    "Największy organ człowieka to skóra.",
+    "Woda pokrywa około 71% powierzchni Ziemi.",
+    "Najmniejsza kość ludzkiego ciała to strzemiączko w uchu.",
+    "Słońce stanowi 99,8% masy całego Układu Słonecznego.",
+    "Pierwsza szczepionka była przeciw ospie prawdziwej.",
+    "Ludzkie serce bije średnio 100 tysięcy razy dziennie.",
+    "Wulkany mogą wpływać na klimat globalny.",
+    "Najzimniejsza temperatura na Ziemi to -89,2°C (Antarktyda)."
+  ],
+  "Sport": [
+    "Igrzyska olimpijskie odbywają się co 4 lata.",
+    "Cristiano Ronaldo strzelił ponad 800 goli w karierze.",
+    "Michael Jordan wygrał 6 finałów NBA.",
+    "Maraton ma długość 42 km 195 m.",
+    "Najstarszy klub piłkarski to Sheffield FC (1857).",
+    "Usain Bolt ustanowił rekord 9,58 sekundy na 100 m.",
+    "Tour de France istnieje od 1903 roku.",
+    "Boks był jednym z najstarszych sportów olimpijskich.",
+    "Najdłuższy mecz tenisowy trwał 11 godzin (Wimbledon 2010).",
+    "Futbol amerykański jest najpopularniejszym sportem w USA."
+  ],
+  "Ogólne": [
+    "Papier wynaleziono w Chinach w II wieku.",
+    "Pierwsze okulary wynaleziono we Włoszech w XIII wieku.",
+    "Największy ocean na świecie to Spokojny (Pacyfik).",
+    "Najstarsze znane miasto to Jerycho.",
+    "Pieniądze papierowe powstały w Chinach.",
+    "Najwyższa góra na świecie to Mount Everest (8849 m).",
+    "Herbata pochodzi z Chin.",
+    "Najstarszy znany instrument to flet z kości sprzed 40 tys. lat.",
+    "Pierwsza książka kucharska powstała w starożytnym Rzymie.",
+    "Internet publicznie dostępny stał się w latach 90."
+  ]
+}

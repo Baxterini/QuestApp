@@ -12,10 +12,13 @@ import requests
 from shutil import which
 import re
 import httpx
-
-
 import streamlit as st
 from pydantic import BaseModel
+import json, hashlib, time
+
+def greet_user(msg):
+    st.write(f"{msg}, {st.session_state.get('user_name', 'Gościu')}!")
+
 
 
 # ---------------- UI / STYL ----------------
@@ -257,6 +260,9 @@ if st.session_state["room"] == "start":
 
 
 # ---------------- MOTYWATOR ZDROWIA 🚵 (pełny) ----------------
+
+
+
 elif st.session_state["room"] == "health":
     st.title("🚵 Motywator zdrowia — Bike Quest")
     greet_user("Hej")
@@ -312,156 +318,200 @@ elif st.session_state["room"] == "health":
     save_data(data)
 
     # ---------------- WYZWANIE 30 DNI ----------------
-    st.subheader("🧱 30 dni bez alkoholu — odliczanie")
+        
     start_date_str = data["challenge"].get("start_date")
 
-    cols = st.columns([2,1,1])
-    with cols[0]:
-        start_date = st.date_input(
-            "Ustaw datę startu wyzwania",
-            value=dt.date.fromisoformat(start_date_str) if start_date_str else dt.date.today()
-        )
-    with cols[1]:
-        if st.button("Start od dziś"):
-            data["challenge"]["start_date"] = dt.date.today().isoformat()
-            save_data(data); st.rerun()
-    with cols[2]:
-        if st.button("Wyczyść start"):
-            data["challenge"]["start_date"] = None
-            save_data(data); st.rerun()
+        # === NOWY BLOK: UFO – 1 ciekawostka dziennie z animacją ===
 
-    if start_date_str != (start_date.isoformat() if start_date else None):
-        data["challenge"]["start_date"] = start_date.isoformat() if start_date else None
-        save_data(data)
 
-    start_date_str = data["challenge"].get("start_date")
-    if start_date_str:
-        start_dt = dt.date.fromisoformat(start_date_str)
-        days_passed = (dt.date.today() - start_dt).days + 1
-        days_passed = max(1, min(days_passed, 30))
-        days_left = 30 - days_passed
-        pct = days_passed / 30
-        m1, m2, m3 = st.columns(3)
-        with m1: st.metric("Dni minęły", days_passed)
-        with m2: st.metric("Zostało", days_left)
-        with m3: st.metric("Start", start_dt.strftime("%Y-%m-%d"))
-        st.progress(pct, text=f"Postęp: {days_passed}/30 dni")
-        if days_passed >= 30:
-            st.success("🏆 30 dni zaliczone! Chcesz nowy cel albo ciągnąć serię dalej?")
+    st.header("🛸 UFO – dzisiejsza ciekawostka")
+
+    def load_facts():
+        fp = os.path.join(os.path.dirname(__file__), "ciekawostki.json")
+        with open(fp, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    FACTS = load_facts()
+    kategorie = list(FACTS.keys())
+
+    def daily_index(seed: str, n: int) -> int:
+        h = hashlib.sha256(seed.encode("utf-8")).hexdigest()
+        return int(h, 16) % n
+
+    def ufo_flight():
+        lane = st.empty()
+        trail = " " * 28
+        for i in range(len(trail)):
+            lane.markdown(f"```\n{trail[:i]}🛸\n```")
+            time.sleep(0.02)
+
+    # ta sama ciekawostka dla wszystkich w danej kategorii przez cały dzień
+    today = dt.date.today().isoformat()
+    kat = st.selectbox("🎲 Kategoria", kategorie, index=0)
+    daily_key = f"ufo_fact_{kat}_{today}"
+
+    if daily_key in st.session_state:
+        st.success(f"💡 Dzisiejsza ciekawostka ({kat}):\n\n{st.session_state[daily_key]}")
+        st.caption("🔒 Zablokowane do północy. Nowa ciekawostka jutro.")
     else:
-        days_passed = 0
-        st.info("Ustaw datę startu — od niej liczymy 30 dni i odliczamy postęp.")
+        if st.button("🪨 Rzuć kamieniem w UFO!"):
+            ufo_flight()
+            idx = daily_index(seed=f"{kat}|{today}", n=len(FACTS[kat]))
+            fact = FACTS[kat][idx]
+            st.session_state[daily_key] = fact
+            st.success(f"🎯 Trafione!\n\n💡 {fact}")
+        else:
+            st.info("Kliknij, żeby odkryć dzisiejszą ciekawostkę.")
+    # === KONIEC BLOKU UFO ===
 
-    st.divider()
+        cols = st.columns([2,1,1])
+        with cols[0]:
+            start_date = st.date_input(
+                "Ustaw datę startu wyzwania",
+                value=dt.date.fromisoformat(start_date_str) if start_date_str else dt.date.today()
+            )
+        with cols[1]:
+            if st.button("Start od dziś"):
+                data["challenge"]["start_date"] = dt.date.today().isoformat()
+                save_data(data); st.rerun()
+        with cols[2]:
+            if st.button("Wyczyść start"):
+                data["challenge"]["start_date"] = None
+                save_data(data); st.rerun()
 
-    # ---------------- PODSUMOWANIE CELÓW DNIA ----------------
-    c1, c2 = st.columns(2)
-    with c1: st.subheader("🎯 Cele na dziś")
-    completed = sum(day_state["done"].get(t.name, False) for t in tasks)
-    with c2:
-        st.metric("Postęp", f"{completed}/{len(tasks)}", help="Dzisiejsze checklisty")
+        if start_date_str != (start_date.isoformat() if start_date else None):
+            data["challenge"]["start_date"] = start_date.isoformat() if start_date else None
+            save_data(data)
 
-    def on_check_change(name):
-        day_state["done"][name] = st.session_state[f"cb_{name}"]
-        data["days"][today] = day_state
-        save_data(data)
+        start_date_str = data["challenge"].get("start_date")
+        if start_date_str:
+            start_dt = dt.date.fromisoformat(start_date_str)
+            days_passed = (dt.date.today() - start_dt).days + 1
+            days_passed = max(1, min(days_passed, 30))
+            days_left = 30 - days_passed
+            pct = days_passed / 30
+            m1, m2, m3 = st.columns(3)
+            with m1: st.metric("Dni minęły", days_passed)
+            with m2: st.metric("Zostało", days_left)
+            with m3: st.metric("Start", start_dt.strftime("%Y-%m-%d"))
+            st.progress(pct, text=f"Postęp: {days_passed}/30 dni")
+            if days_passed >= 30:
+                st.success("🏆 30 dni zaliczone! Chcesz nowy cel albo ciągnąć serię dalej?")
+        else:
+            days_passed = 0
+            st.info("Ustaw datę startu — od niej liczymy 30 dni i odliczamy postęp.")
 
-    for t in tasks:
-        st.checkbox(
-            f"**{t.name}** — _{t.category}_",
-            value=day_state["done"].get(t.name, False),
-            key=f"cb_{t.name}",
-            help=t.hint,
-            on_change=on_check_change,
-            args=(t.name,),
+        st.divider()
+
+        # ---------------- PODSUMOWANIE CELÓW DNIA ----------------
+        c1, c2 = st.columns(2)
+        with c1: st.subheader("🎯 Cele na dziś")
+        completed = sum(day_state["done"].get(t.name, False) for t in tasks)
+        with c2:
+            st.metric("Postęp", f"{completed}/{len(tasks)}", help="Dzisiejsze checklisty")
+
+        def on_check_change(name):
+            day_state["done"][name] = st.session_state[f"cb_{name}"]
+            data["days"][today] = day_state
+            save_data(data)
+
+        for t in tasks:
+            st.checkbox(
+                f"**{t.name}** — _{t.category}_",
+                value=day_state["done"].get(t.name, False),
+                key=f"cb_{t.name}",
+                help=t.hint,
+                on_change=on_check_change,
+                args=(t.name,),
+            )
+
+        st.divider()
+
+        # ---------------- LICZNIK WODY ----------------
+        st.subheader("💧 Licznik wody (cel 2000 ml)")
+        w1, w2, w3 = st.columns([1,2,1])
+
+        def adjust_water(delta):
+            day_state["water_ml"] = max(0, day_state["water_ml"] + delta)
+            data["days"][today] = day_state
+            save_data(data)
+
+        with w1:
+            if st.button("-250 ml"): adjust_water(-250)
+        with w2:
+            st.progress(min(day_state["water_ml"]/2000, 1.0))
+            st.write(f"Wypite: **{day_state['water_ml']} ml / 2000 ml**")
+        with w3:
+            if st.button("+250 ml"): adjust_water(+250)
+
+        st.info(f"🎲 Bonus dnia: **{day_state['bonus']}** (opcjonalnie)")
+
+        st.divider()
+
+        # ---------------- NOTATKI ----------------
+        st.subheader("📝 Notatki na dziś")
+        notes_val = st.text_area(
+            "Co warto zapamiętać (myśli, spostrzeżenia, wdzięczność)?",
+            value=day_state.get("notes", ""), height=140,
+            placeholder="Np. „Dziś najtrudniejsza była ochota na słodkie po obiedzie…”"
         )
+        if st.button("Zapisz notatki"):
+            day_state["notes"] = notes_val
+            data["days"][today] = day_state
+            save_data(data)
+            st.success("Zapisano notatki.")
 
-    st.divider()
+        # ---------------- MOTYWACJA ----------------
+        def motivation(completed, total, days_passed, start_set):
+            if not start_set:
+                return "Każda zmiana zaczyna się od decyzji. Ustaw datę startu i zrób dziś pierwszy krok."
+            if days_passed in (1, 2, 3):
+                return "Pierwsze dni nadają rytm. Prosto, spokojnie, konsekwentnie."
+            if days_passed in (5, 10, 15, 20, 25):
+                return f"Checkpoint {days_passed}! Zabierasz ze sobą power-up i jedziesz dalej 🚵"
+            if completed == total and total > 0:
+                return "Pięknie! Dziś komplet. Korona rośnie w oczach — jutro powtórka 👑"
+            if completed >= max(1, total//2):
+                return "Ponad połowa za Tobą. Jeszcze chwila i dzień na zielono!"
+            return "Nie musisz robić wszystkiego naraz. Jedna rzecz teraz — rozruch to 80% sukcesu."
 
-    # ---------------- LICZNIK WODY ----------------
-    st.subheader("💧 Licznik wody (cel 2000 ml)")
-    w1, w2, w3 = st.columns([1,2,1])
+        st.success("💬 " + motivation(completed, len(tasks), days_passed, bool(start_date_str)))
 
-    def adjust_water(delta):
-        day_state["water_ml"] = max(0, day_state["water_ml"] + delta)
-        data["days"][today] = day_state
-        save_data(data)
+        st.divider()
 
-    with w1:
-        if st.button("-250 ml"): adjust_water(-250)
-    with w2:
-        st.progress(min(day_state["water_ml"]/2000, 1.0))
-        st.write(f"Wypite: **{day_state['water_ml']} ml / 2000 ml**")
-    with w3:
-        if st.button("+250 ml"): adjust_water(+250)
+        # ---------------- MINI-GRA: BIKE QUEST 6×5 ----------------
+        st.subheader("🎮 Bike Quest: 30-dniowa trasa 🚵 → 🏰")
+        st.caption("Każdy dzień streaka przesuwa Cię o jedno pole. Co 5 pól — power-up!")
 
-    st.info(f"🎲 Bonus dnia: **{day_state['bonus']}** (opcjonalnie)")
+        def draw_rpg_board(days_passed: int) -> str:
+            total, rows, cols = 30, 5, 6  # 5 wierszy × 6 kol. = 30
+            tiles = []
+            for r in range(rows):
+                row = []
+                for c in range(cols):
+                    i = r * cols + c + 1
+                    if i == total:
+                        row.append("🏰")        # meta
+                    elif i == days_passed and i < total:
+                        row.append("🚵")        # gracz
+                    elif i in POWERUPS and i > days_passed:
+                        row.append(POWERUPS[i]) # power-up widoczny na trasie
+                    elif i < days_passed:
+                        row.append("🟩")        # przebyte pola (zielone)
+                    else:
+                        row.append("▫️")        # puste pole
+                tiles.append("".join(row))
+            return "\n".join(tiles)
 
-    st.divider()
+        # narysuj planszę
+        if start_date_str:
+            st.text(draw_rpg_board(days_passed))
+        else:
+            st.info("Ustaw datę startu wyzwania, aby wyruszyć w trasę 🚵")
 
-    # ---------------- NOTATKI ----------------
-    st.subheader("📝 Notatki na dziś")
-    notes_val = st.text_area(
-        "Co warto zapamiętać (myśli, spostrzeżenia, wdzięczność)?",
-        value=day_state.get("notes", ""), height=140,
-        placeholder="Np. „Dziś najtrudniejsza była ochota na słodkie po obiedzie…”"
-    )
-    if st.button("Zapisz notatki"):
-        day_state["notes"] = notes_val
-        data["days"][today] = day_state
-        save_data(data)
-        st.success("Zapisano notatki.")
+        # legenda
+        st.caption("Legenda: 🚵 Ty | 🟩 przebyte | ▫️ do przejechania | 💧🍎🛌📓🧘 power-upy | 🏰 meta | 👑 nagroda")
 
-    # ---------------- MOTYWACJA ----------------
-    def motivation(completed, total, days_passed, start_set):
-        if not start_set:
-            return "Każda zmiana zaczyna się od decyzji. Ustaw datę startu i zrób dziś pierwszy krok."
-        if days_passed in (1, 2, 3):
-            return "Pierwsze dni nadają rytm. Prosto, spokojnie, konsekwentnie."
-        if days_passed in (5, 10, 15, 20, 25):
-            return f"Checkpoint {days_passed}! Zabierasz ze sobą power-up i jedziesz dalej 🚵"
-        if completed == total and total > 0:
-            return "Pięknie! Dziś komplet. Korona rośnie w oczach — jutro powtórka 👑"
-        if completed >= max(1, total//2):
-            return "Ponad połowa za Tobą. Jeszcze chwila i dzień na zielono!"
-        return "Nie musisz robić wszystkiego naraz. Jedna rzecz teraz — rozruch to 80% sukcesu."
-
-    st.success("💬 " + motivation(completed, len(tasks), days_passed, bool(start_date_str)))
-
-    st.divider()
-
-    # ---------------- MINI-GRA: BIKE QUEST 6×5 ----------------
-    st.subheader("🎮 Bike Quest: 30-dniowa trasa 🚵 → 🏰")
-    st.caption("Każdy dzień streaka przesuwa Cię o jedno pole. Co 5 pól — power-up!")
-
-    def draw_rpg_board(days_passed: int) -> str:
-        total, rows, cols = 30, 5, 6  # 5 wierszy × 6 kol. = 30
-        tiles = []
-        for r in range(rows):
-            row = []
-            for c in range(cols):
-                i = r * cols + c + 1
-                if i == total:
-                    row.append("🏰")        # meta
-                elif i == days_passed and i < total:
-                    row.append("🚵")        # gracz
-                elif i in POWERUPS and i > days_passed:
-                    row.append(POWERUPS[i]) # power-up widoczny na trasie
-                elif i < days_passed:
-                    row.append("🟩")        # przebyte pola (zielone)
-                else:
-                    row.append("▫️")        # puste pole
-            tiles.append("".join(row))
-        return "\n".join(tiles)
-
-    # narysuj planszę
-    if start_date_str:
-        st.text(draw_rpg_board(days_passed))
-    else:
-        st.info("Ustaw datę startu wyzwania, aby wyruszyć w trasę 🚵")
-
-    # legenda
-    st.caption("Legenda: 🚵 Ty | 🟩 przebyte | ▫️ do przejechania | 💧🍎🛌📓🧘 power-upy | 🏰 meta | 👑 nagroda")
 
 # ---------------- MIND ROOM 🧘 ----------------
 
